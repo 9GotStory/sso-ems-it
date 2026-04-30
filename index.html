@@ -1,0 +1,2626 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Asset Registry</title>
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: IBM Plex Sans Thai + IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Sarabun:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    :root {
+      --navy: #0d1b2a;
+      --navy-light: #1b2d42;
+      --navy-border: #263c54;
+      --accent: #3b82f6;
+      --accent-dim: #1d4ed8;
+      --surface: #f8fafc;
+      --surface-2: #f1f5f9;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --warning: #f97316;
+      --caution: #eab308;
+      --ok: #22c55e;
+      --sidebar-w: 260px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Sarabun', 'IBM Plex Sans Thai', sans-serif;
+      background: var(--surface);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Sidebar ─────────────────────────────────── */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: transform .3s ease;
+      overflow-y: auto;
+    }
+
+    #sidebar::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #sidebar::-webkit-scrollbar-thumb {
+      background: var(--navy-border);
+      border-radius: 2px;
+    }
+
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--navy-border);
+    }
+
+    .sidebar-logo .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .sidebar-logo h1 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .5px;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .sidebar-logo span {
+      font-size: 11px;
+      color: #64748b;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .sidebar-section {
+      padding: 16px 12px 8px;
+    }
+
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #475569;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0 8px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #94a3b8;
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: all .15s ease;
+      user-select: none;
+      text-decoration: none;
+      margin-bottom: 2px;
+    }
+
+    .nav-item:hover {
+      background: var(--navy-light);
+      color: #cbd5e1;
+    }
+
+    .nav-item.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .nav-item.active svg {
+      color: #fff;
+    }
+
+    .nav-item svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .nav-item .nav-badge {
+      margin-left: auto;
+      background: #ef4444;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 12px;
+      border-top: 1px solid var(--navy-border);
+    }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: var(--navy-light);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .user-chip .user-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .user-chip .user-role {
+      font-size: 10px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .admin-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ok);
+    }
+
+    /* ── Main Content ────────────────────────────── */
+    #main {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Topbar ──────────────────────────────────── */
+    #topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(248, 250, 252, .95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-main);
+      padding: 4px;
+    }
+
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .topbar-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Page Content ────────────────────────────── */
+    #page-content {
+      flex: 1;
+      padding: 28px;
+      max-width: 1400px;
+    }
+
+    /* ── Cards & Surfaces ────────────────────────── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-header h2 {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-main);
+    }
+
+    .card-header .card-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    /* ── Stat Cards ──────────────────────────────── */
+    .stat-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow .2s;
+    }
+
+    .stat-card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
+    }
+
+    .stat-card .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+
+    .stat-card .stat-val {
+      font-size: 32px;
+      font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      line-height: 1;
+    }
+
+    .stat-card .stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .stat-card .stat-stripe {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      border-radius: 0 12px 12px 0;
+    }
+
+    /* ── Badges / Risk Chips ─────────────────────── */
+    .risk-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .risk-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-repair {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .status-retired {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-standby {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    .nt-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* ── Table ───────────────────────────────────── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .data-table thead tr {
+      background: var(--surface-2);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .data-table th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr {
+      transition: background .1s;
+      cursor: pointer;
+    }
+
+    .data-table tbody tr:hover {
+      background: var(--surface-2);
+    }
+
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .asset-name-cell {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .asset-id-cell {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .ip-cell {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+    }
+
+    /* ── Search / Filter Bar ─────────────────────── */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      max-width: 340px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      color: var(--text-light);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+
+    .filter-select:focus {
+      border-color: var(--accent);
+    }
+
+    /* ── Buttons ─────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-dim);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface-2);
+      color: var(--text-main);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 7px;
+    }
+
+    /* ── Tabs ────────────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      gap: 2px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* ── Modal ───────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0, 0, 0, .5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-box {
+      background: #fff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 780px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, .2);
+      transform: translateY(-20px);
+      transition: transform .2s;
+      margin: auto;
+    }
+
+    .modal-overlay.open .modal-box {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-header h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      flex: 1;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* ── Form ────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: .3px;
+    }
+
+    .form-label .req {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .form-control {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-main);
+      background: #fff;
+      outline: none;
+      transition: border-color .15s;
+      width: 100%;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, .1);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding: 4px 0;
+      margin-top: 8px;
+      border-bottom: 1px solid #dbeafe;
+      grid-column: 1 / -1;
+    }
+
+    /* ── Detail Panel (Slide-in) ─────────────────── */
+    #detail-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 600px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -8px 0 32px rgba(0, 0, 0, .12);
+      z-index: 150;
+      transform: translateX(100%);
+      transition: transform .3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #detail-panel.open {
+      transform: translateX(0);
+    }
+
+    .panel-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .panel-header-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .panel-header-info h2 {
+      font-size: 17px;
+      font-weight: 700;
+      margin: 0 0 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .panel-header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    #panel-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 140;
+      background: rgba(0, 0, 0, .3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+
+    #panel-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── Info Grid ───────────────────────────────── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .info-item {}
+
+    .info-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 3px;
+    }
+
+    .info-value {
+      font-size: 13.5px;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .info-value.mono {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px;
+    }
+
+    .info-value.empty {
+      color: var(--text-light);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    /* ── Risk Matrix Cards ───────────────────────── */
+    .risk-group-card {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .risk-group-header {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .risk-group-header h3 {
+      font-size: 13px;
+      font-weight: 700;
+      margin: 0;
+      color: #fff;
+    }
+
+    .risk-group-body {
+      background: #fff;
+    }
+
+    /* ── Toast ───────────────────────────────────── */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: slideUp .3s ease;
+      max-width: 320px;
+    }
+
+    .toast-success {
+      background: #16a34a;
+    }
+
+    .toast-error {
+      background: var(--danger);
+    }
+
+    .toast-info {
+      background: var(--accent);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── Loading Spinner ─────────────────────────── */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .page-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* ── Empty State ─────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      color: var(--text-light);
+      margin: 0 auto 12px;
+    }
+
+    .empty-state h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+    }
+
+    /* ── Divider ─────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 16px 0;
+    }
+
+    /* ── Confirm Dialog ──────────────────────────── */
+    #confirm-modal .modal-box {
+      max-width: 420px;
+    }
+
+    /* ── Admin Panel ─────────────────────────────── */
+    .risk-level-row {
+      display: grid;
+      grid-template-columns: auto 1fr 1fr 80px 80px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .risk-level-row:last-child {
+      border-bottom: none;
+    }
+
+    .color-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="color"] {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    /* ── Responsive ──────────────────────────────── */
+    @media (max-width: 1024px) {
+      #sidebar {
+        transform: translateX(-100%);
+      }
+
+      #sidebar.open {
+        transform: translateX(0);
+        box-shadow: 8px 0 32px rgba(0, 0, 0, .2);
+      }
+
+      #main {
+        margin-left: 0;
+      }
+
+      #menu-toggle {
+        display: block;
+      }
+
+      #page-content {
+        padding: 20px 16px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid-3 {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      #detail-panel {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .form-grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-wrap {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════ -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8M12 17v4" />
+          <circle cx="8" cy="10" r="1" fill="white" stroke="none" />
+          <circle cx="12" cy="10" r="1" fill="white" stroke="none" />
+          <circle cx="16" cy="10" r="1" fill="white" stroke="none" />
+        </svg>
+      </div>
+      <h1>IT Asset Registry</h1>
+      <span>v<span id="app-version">1.0.0</span></span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">ภาพรวม</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+        </svg>
+        Dashboard
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">ทรัพย์สิน</div>
+      <div class="nav-item" data-page="assets" onclick="navigate('assets')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8M12 17v4" />
+        </svg>
+        รายการอุปกรณ์
+      </div>
+      <div class="nav-item" data-page="network" onclick="navigate('network')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="5" r="3" />
+          <circle cx="5" cy="19" r="3" />
+          <circle cx="19" cy="19" r="3" />
+          <path d="M12 8v3M7.2 17.2l-1.9-3M16.8 17.2l1.9-3" />
+        </svg>
+        อุปกรณ์เครือข่าย NT
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">วิเคราะห์</div>
+      <div class="nav-item" data-page="risk" onclick="navigate('risk')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        ภาพรวมความเสี่ยง
+        <span class="nav-badge" id="critical-count" style="display:none"></span>
+      </div>
+    </div>
+
+    <div class="sidebar-section" id="admin-section" style="display:none">
+      <div class="sidebar-section-label">Admin</div>
+      <div class="nav-item" data-page="admin" onclick="navigate('admin')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14" />
+        </svg>
+        ตั้งค่าระบบ
+      </div>
+      <div class="nav-item" data-page="audit" onclick="navigate('audit')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+        </svg>
+        Audit Log
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div>
+          <div class="user-name" id="user-name">กำลังโหลด...</div>
+          <div class="user-role">
+            <span class="admin-dot" id="role-dot" style="background:#64748b"></span>
+            <span id="user-role-label">ผู้เยี่ยมชม</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div id="sidebar-overlay" onclick="closeSidebar()"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;"></div>
+
+  <!-- ════════════════════════════════════════════════
+     MAIN
+════════════════════════════════════════════════ -->
+  <div id="main">
+    <!-- Topbar -->
+    <div id="topbar">
+      <button id="menu-toggle" onclick="toggleSidebar()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+      <div>
+        <div class="topbar-title" id="page-title">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div id="topbar-admin-badge" style="display:none">
+          <span style="background:#dcfce7;color:#166534;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;display:flex;align-items:center;gap:4px;">
+          <span style="width:6px;height:6px;border-radius:50%;background:#16a34a;display:inline-block;"></span>
+          Admin Mode
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Content -->
+    <div id="page-content">
+
+      <!-- ── PAGE: Dashboard ── -->
+      <div id="page-dashboard" class="page">
+        <div id="dashboard-content">
+          <div class="page-loading">
+            <div class="spinner"></div><span>กำลังโหลดข้อมูล...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE: Assets ── -->
+      <div id="page-assets" class="page" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="#3b82f6" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" />
+              <path d="M8 21h8M12 17v4" />
+            </svg>
+            <h2>รายการทรัพย์สิน IT</h2>
+            <span class="card-sub" id="asset-count-label">โหลดอยู่...</span>
+            <div id="add-asset-btn-wrap" style="margin-left:8px;display:none;">
+              <button class="btn btn-primary btn-sm" onclick="openAssetModal()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              เพิ่มอุปกรณ์
+            </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Filter Bar -->
+            <div class="filter-bar" style="margin-bottom:16px;">
+              <div class="search-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" class="search-input" id="search-input" placeholder="ค้นหา ชื่อ, ID, IP..." oninput="filterAssets()">
+              </div>
+              <select class="filter-select" id="filter-type" onchange="filterAssets()">
+              <option value="">ทุกประเภท</option>
+              <option>PC</option>
+              <option>Notebook</option>
+              <option>MikroTik</option>
+              <option>Switch Hub</option>
+              <option>Router</option>
+              <option>Mesh WiFi</option>
+            </select>
+              <select class="filter-select" id="filter-status" onchange="filterAssets()">
+              <option value="">ทุกสถานะ</option>
+              <option>ใช้งาน</option>
+              <option>ซ่อม</option>
+              <option>เลิกใช้</option>
+              <option>สำรอง</option>
+            </select>
+              <select class="filter-select" id="filter-risk" onchange="filterAssets()">
+              <option value="">ทุกความเสี่ยง</option>
+            </select>
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);cursor:pointer;padding:8px 2px;">
+              <input type="checkbox" id="filter-nt" onchange="filterAssets()" style="accent-color:var(--accent);">
+              เฉพาะ NT
+            </label>
+            </div>
+            <!-- Table -->
+            <div id="assets-table-wrap">
+              <div class="page-loading">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE: Network ── -->
+      <div id="page-network" class="page" style="display:none">
+        <div id="network-content">
+          <div class="page-loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE: Risk ── -->
+      <div id="page-risk" class="page" style="display:none">
+        <div id="risk-content">
+          <div class="page-loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE: Admin ── -->
+      <div id="page-admin" class="page" style="display:none">
+        <div id="admin-content">
+          <div class="page-loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAGE: Audit ── -->
+      <div id="page-audit" class="page" style="display:none">
+        <div id="audit-content">
+          <div class="page-loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main -->
+
+  <!-- ════════════════════════════════════════════════
+     DETAIL PANEL (SLIDE-IN)
+════════════════════════════════════════════════ -->
+  <div id="panel-overlay" onclick="closePanel()"></div>
+  <div id="detail-panel">
+    <div class="panel-header">
+      <div class="panel-header-info">
+        <h2 id="panel-asset-name">—</h2>
+        <div class="panel-header-meta" id="panel-meta"></div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <div id="panel-admin-actions" style="display:none;gap:6px;display:none;">
+          <button class="btn btn-ghost btn-sm btn-icon" id="panel-edit-btn" title="แก้ไข">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+          <button class="btn btn-ghost btn-sm btn-icon" id="panel-delete-btn" title="ลบ" style="color:var(--danger)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+        </div>
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="closePanel()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <div class="tab-bar" id="panel-tabs">
+        <button class="tab-btn active" onclick="switchPanelTab('info',this)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        ข้อมูลทั่วไป
+      </button>
+        <button class="tab-btn" onclick="switchPanelTab('roles',this)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="2"/></svg>
+        หน้าที่
+      </button>
+        <button class="tab-btn" onclick="switchPanelTab('risk',this)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+        ความเสี่ยง
+      </button>
+        <button class="tab-btn" onclick="switchPanelTab('access',this)" id="access-tab-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        สิทธิ์
+      </button>
+        <button class="tab-btn" onclick="switchPanelTab('plan',this)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        แผนจัดการ
+      </button>
+      </div>
+      <div id="panel-tab-info" class="tab-pane active">
+        <div class="page-loading">
+          <div class="spinner"></div>
+        </div>
+      </div>
+      <div id="panel-tab-roles" class="tab-pane"></div>
+      <div id="panel-tab-risk" class="tab-pane"></div>
+      <div id="panel-tab-access" class="tab-pane"></div>
+      <div id="panel-tab-plan" class="tab-pane"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+     MODAL: ADD / EDIT ASSET
+════════════════════════════════════════════════ -->
+  <div id="asset-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div
+          style="width:36px;height:36px;background:#eff6ff;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="#3b82f6" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <path d="M8 21h8M12 17v4" />
+          </svg>
+        </div>
+        <h2 id="modal-title">เพิ่มอุปกรณ์ใหม่</h2>
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="closeAssetModal()" style="margin-left:auto">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      </div>
+      <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+        <div id="asset-form-content"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeAssetModal()">ยกเลิก</button>
+        <button class="btn btn-primary" id="modal-save-btn" onclick="saveAsset()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        บันทึก
+      </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+     MODAL: CONFIRM
+════════════════════════════════════════════════ -->
+  <div id="confirm-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div
+          style="width:36px;height:36px;background:#fee2e2;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="#ef4444" stroke-width="2">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+            <path d="M9 6V4h6v2" />
+          </svg>
+        </div>
+        <h2 id="confirm-title">ยืนยันการลบ</h2>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-message" style="font-size:14px;color:var(--text-muted);margin:0;line-height:1.6;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeConfirmModal()">ยกเลิก</button>
+        <button class="btn btn-ghost" id="confirm-soft-btn" onclick="confirmSoftDelete()" style="display:none;color:var(--warning);border-color:var(--warning);">
+        เปลี่ยนสถานะเป็น "เลิกใช้"
+      </button>
+        <button class="btn btn-danger" id="confirm-hard-btn" onclick="confirmHardDelete()">
+        ลบถาวร
+      </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- ════════════════════════════════════════════════
+     JAVASCRIPT — APP CORE
+════════════════════════════════════════════════ -->
+  <script>
+    // ── App State ──────────────────────────────────────────────
+const App = {
+  // injected from GAS doGet()
+  userInfo:     <?= userInfo ?>,
+  riskLevels:   <?= riskLevels ?>,
+  assetTypes:   <?= assetTypes ?>,
+  assetStatus:  <?= assetStatus ?>,
+  accessLevels: <?= accessLevels ?>,
+  version:      "<?= version ?>",
+
+  // runtime state
+  currentPage:  "dashboard",
+  assets:       [],
+  filteredAssets: [],
+  dashboardData: null,
+  editingAssetId: null,
+  pendingDeleteId: null,
+};
+
+// ── GAS API Call ───────────────────────────────────────────
+function gasCall(action, payload = {}) {
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler(res => resolve(res))
+      .withFailureHandler(err => reject(err))
+      .routeAction(action, payload);
+  });
+}
+
+// ── Init ───────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('app-version').textContent = App.version;
+  initUserUI();
+  loadRiskFilterOptions();
+  navigate('dashboard');
+  loadDashboard();
+});
+
+// ── User UI ────────────────────────────────────────────────
+function initUserUI() {
+  const u = App.userInfo;
+  const nameEl = document.getElementById('user-name');
+  const avatarEl = document.getElementById('user-avatar');
+  const roleEl = document.getElementById('user-role-label');
+  const dotEl = document.getElementById('role-dot');
+  const adminSection = document.getElementById('admin-section');
+  const topbarBadge = document.getElementById('topbar-admin-badge');
+  const addBtn = document.getElementById('add-asset-btn-wrap');
+  const panelActions = document.getElementById('panel-admin-actions');
+
+  nameEl.textContent = u.name || 'ผู้เยี่ยมชม';
+  avatarEl.textContent = (u.name || 'G').charAt(0).toUpperCase();
+
+  if (u.isAdmin) {
+    roleEl.textContent = 'Administrator';
+    dotEl.style.background = '#22c55e';
+    adminSection.style.display = 'block';
+    topbarBadge.style.display = 'block';
+    addBtn.style.display = 'block';
+    panelActions.style.display = 'flex';
+    avatarEl.style.background = '#16a34a';
+  } else if (u.isLoggedIn) {
+    roleEl.textContent = 'ผู้ใช้งาน';
+    dotEl.style.background = '#3b82f6';
+  }
+}
+
+// ── Navigation ─────────────────────────────────────────────
+function navigate(page) {
+  // hide all pages
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  // show target
+  const target = document.getElementById('page-' + page);
+  if (target) target.style.display = 'block';
+
+  // update nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const activeNav = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (activeNav) activeNav.classList.add('active');
+
+  // update title
+  const titles = {
+    dashboard: 'Dashboard',
+    assets:    'รายการทรัพย์สิน IT',
+    network:   'อุปกรณ์เครือข่าย NT',
+    risk:      'ภาพรวมความเสี่ยง',
+    admin:     'ตั้งค่าระบบ',
+    audit:     'Audit Log',
+  };
+  document.getElementById('page-title').textContent = titles[page] || page;
+  App.currentPage = page;
+
+  // lazy load
+  if (page === 'assets' && App.assets.length === 0) loadAssets();
+  if (page === 'network') loadNetwork();
+  if (page === 'risk') loadRisk();
+  if (page === 'admin' && App.userInfo.isAdmin) loadAdmin();
+  if (page === 'audit' && App.userInfo.isAdmin) loadAudit();
+
+  closeSidebar();
+}
+
+// ── Risk Level Helpers ─────────────────────────────────────
+function getRiskLevel(id) {
+  return App.riskLevels.find(r => r.id === id) || { label: id, color: '#94a3b8', textColor: '#fff' };
+}
+
+function riskBadgeHTML(levelId) {
+  const r = getRiskLevel(levelId);
+  return `<span class="risk-badge" style="background:${r.color}20;color:${r.color};border:1px solid ${r.color}40;">
+    <span class="risk-dot" style="background:${r.color}"></span>${r.label}
+  </span>`;
+}
+
+function loadRiskFilterOptions() {
+  const sel = document.getElementById('filter-risk');
+  App.riskLevels.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.id;
+    opt.textContent = r.label;
+    sel.appendChild(opt);
+  });
+}
+
+// ── Status Badge ───────────────────────────────────────────
+function statusBadgeHTML(status) {
+  const map = {
+    'ใช้งาน': 'status-active',
+    'ซ่อม':   'status-repair',
+    'เลิกใช้':'status-retired',
+    'สำรอง':  'status-standby',
+  };
+  return `<span class="status-badge ${map[status]||''}">${status||'—'}</span>`;
+}
+
+// ── Type Icon ──────────────────────────────────────────────
+function typeIconHTML(type) {
+  const icons = {
+    'PC':         '🖥️', 'Notebook': '💻',
+    'MikroTik':   '📡', 'Switch Hub': '🔀',
+    'Router':     '🌐', 'Mesh WiFi': '📶',
+  };
+  return icons[type] || '📦';
+}
+
+// ── Sidebar ────────────────────────────────────────────────
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  const isOpen = sb.classList.contains('open');
+  if (isOpen) { sb.classList.remove('open'); ov.style.display = 'none'; }
+  else        { sb.classList.add('open');    ov.style.display = 'block'; }
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').style.display = 'none';
+}
+
+// ── Toast ──────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  const icons = { success:'✓', error:'✕', info:'ℹ' };
+  t.innerHTML = `<span>${icons[type]||'●'}</span> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ── Panel ──────────────────────────────────────────────────
+function openPanel(assetId) {
+  document.getElementById('detail-panel').classList.add('open');
+  document.getElementById('panel-overlay').classList.add('open');
+  loadAssetDetail(assetId);
+}
+function closePanel() {
+  document.getElementById('detail-panel').classList.remove('open');
+  document.getElementById('panel-overlay').classList.remove('open');
+}
+
+// ── Panel Tab ──────────────────────────────────────────────
+function switchPanelTab(tab, btn) {
+  document.querySelectorAll('#panel-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('[id^="panel-tab-"]').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-tab-' + tab).classList.add('active');
+}
+
+// ── Modal ──────────────────────────────────────────────────
+function openAssetModal(assetId = null) {
+  App.editingAssetId = assetId;
+  document.getElementById('modal-title').textContent = assetId ? 'แก้ไขอุปกรณ์' : 'เพิ่มอุปกรณ์ใหม่';
+  renderAssetForm(assetId);
+  document.getElementById('asset-modal').classList.add('open');
+}
+function closeAssetModal() {
+  document.getElementById('asset-modal').classList.remove('open');
+  App.editingAssetId = null;
+}
+
+// ── Confirm Delete ─────────────────────────────────────────
+function openDeleteModal(assetId, assetName) {
+  App.pendingDeleteId = assetId;
+  document.getElementById('confirm-title').textContent = `ลบ "${assetName}"`;
+  document.getElementById('confirm-message').textContent =
+    `คุณต้องการลบอุปกรณ์ "${assetName}" (${assetId}) ออกจากระบบ\n\nเลือก "เปลี่ยนสถานะ" เพื่อ Soft Delete หรือ "ลบถาวร" เพื่อลบออกจาก Sheets ทั้งหมด`;
+  document.getElementById('confirm-soft-btn').style.display = 'inline-flex';
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function closeConfirmModal() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  App.pendingDeleteId = null;
+}
+async function confirmSoftDelete() {
+  if (!App.pendingDeleteId) return;
+  try {
+    const res = await gasCall('SOFT_DELETE_ASSET', { asset_id: App.pendingDeleteId });
+    if (res.success) {
+      showToast(res.message, 'success');
+      closeConfirmModal(); closePanel();
+      App.assets = []; loadAssets();
+      if (App.currentPage === 'dashboard') loadDashboard();
+    } else { showToast(res.message, 'error'); }
+  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+}
+async function confirmHardDelete() {
+  if (!App.pendingDeleteId) return;
+  try {
+    const res = await gasCall('HARD_DELETE_ASSET', { asset_id: App.pendingDeleteId });
+    if (res.success) {
+      showToast(res.message, 'success');
+      closeConfirmModal(); closePanel();
+      App.assets = []; loadAssets();
+      if (App.currentPage === 'dashboard') loadDashboard();
+    } else { showToast(res.message, 'error'); }
+  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════
+async function loadDashboard() {
+  const el = document.getElementById('dashboard-content');
+  try {
+    const res = await gasCall('GET_DASHBOARD');
+    if (!res.success) { el.innerHTML = `<div class="empty-state"><p>${res.message}</p></div>`; return; }
+    App.dashboardData = res.data;
+    renderDashboard(res.data);
+
+    // update critical badge
+    const critical = (res.data.riskLevels || []).find(r => r.order >= (res.data.riskLevels.length));
+    const criticalCount = critical ? (res.data.byRisk[critical.id] || 0) : 0;
+    if (criticalCount > 0) {
+      const badge = document.getElementById('critical-count');
+      badge.textContent = criticalCount;
+      badge.style.display = 'inline';
+    }
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state"><p>โหลดข้อมูลล้มเหลว: ${e.message||e}</p></div>`;
+  }
+}
+
+function renderDashboard(d) {
+  const el = document.getElementById('dashboard-content');
+
+  // Stat cards
+  const statCards = [
+    { label: 'อุปกรณ์ทั้งหมด', val: d.total,      color: '#3b82f6', icon: '🖥️', stripe: '#3b82f6' },
+    { label: 'ใช้งานอยู่',      val: d.byStatus['ใช้งาน']||0, color: '#22c55e', icon: '✅', stripe: '#22c55e' },
+    { label: 'อุปกรณ์ NT',      val: d.ntCount,    color: '#8b5cf6', icon: '📡', stripe: '#8b5cf6' },
+    { label: 'ความเสี่ยงสูง+', val: d.highRiskCount, color: '#ef4444', icon: '⚠️', stripe: '#ef4444' },
+  ];
+
+  let statsHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">`;
+  statCards.forEach(s => {
+    statsHTML += `
+    <div class="stat-card">
+      <div class="stat-stripe" style="background:${s.stripe}"></div>
+      <div style="font-size:24px">${s.icon}</div>
+      <div class="stat-val" style="color:${s.color}">${s.val}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>`;
+  });
+  statsHTML += `</div>`;
+
+  // Risk summary chips
+  let riskSummaryHTML = `<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;">`;
+  d.riskLevels.forEach(r => {
+    const count = d.byRisk[r.id] || 0;
+    riskSummaryHTML += `
+    <div style="background:#fff;border:1px solid ${r.color}40;border-radius:10px;padding:12px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:box-shadow .15s"
+         onmouseover="this.style.boxShadow='0 4px 12px ${r.color}30'" onmouseout="this.style.boxShadow='none'"
+         onclick="navigate('risk')">
+      <span style="width:12px;height:12px;border-radius:50%;background:${r.color};flex-shrink:0"></span>
+      <div>
+        <div style="font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:${r.color}">${count}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${r.label}</div>
+      </div>
+    </div>`;
+  });
+  riskSummaryHTML += `</div>`;
+
+  // Type breakdown
+  let typeHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:24px;">`;
+  Object.entries(d.byType).forEach(([type, count]) => {
+    typeHTML += `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer"
+         onclick="navigate('assets');document.getElementById('filter-type').value='${type}';filterAssets()">
+      <div style="font-size:26px;margin-bottom:6px">${typeIconHTML(type)}</div>
+      <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace">${count}</div>
+      <div style="font-size:11px;color:var(--text-muted)">${type}</div>
+    </div>`;
+  });
+  typeHTML += `</div>`;
+
+  // High risk table
+  let highRiskHTML = '';
+  if (d.highRiskAssets && d.highRiskAssets.length > 0) {
+    highRiskHTML = `
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-header">
+        <span style="font-size:18px">⚠️</span>
+        <h2>อุปกรณ์ที่ต้องให้ความสนใจ</h2>
+        <span class="card-sub">${d.highRiskAssets.length} รายการ</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr>
+            <th>อุปกรณ์</th><th>ประเภท</th><th>แผนก</th>
+            <th>ความเสี่ยง</th><th>สถานะ</th>
+          </tr></thead>
+          <tbody>`;
+    d.highRiskAssets.forEach(a => {
+      highRiskHTML += `
+        <tr onclick="openPanel('${a.asset_id}')">
+          <td>
+            <div class="asset-name-cell">${a.name}</div>
+            <div class="asset-id-cell">${a.asset_id}</div>
+          </td>
+          <td>${typeIconHTML(a.type)} ${a.type}</td>
+          <td>${a.department||'—'}</td>
+          <td>${riskBadgeHTML(a.risk_level_id)}</td>
+          <td>${statusBadgeHTML(a.status)}</td>
+        </tr>`;
+    });
+    highRiskHTML += `</tbody></table></div></div>`;
+  }
+
+  el.innerHTML = statsHTML + riskSummaryHTML +
+    `<div class="card" style="margin-bottom:24px;">
+      <div class="card-header"><h2>สรุปตามประเภทอุปกรณ์</h2></div>
+      <div class="card-body">${typeHTML}</div>
+    </div>` +
+    highRiskHTML;
+}
+
+// ══════════════════════════════════════════════════════════
+// ASSET LIST
+// ══════════════════════════════════════════════════════════
+async function loadAssets() {
+  const el = document.getElementById('assets-table-wrap');
+  el.innerHTML = `<div class="page-loading"><div class="spinner"></div></div>`;
+  try {
+    const res = await gasCall('GET_ASSET_LIST', {});
+    if (!res.success) { showToast(res.message, 'error'); return; }
+    App.assets = res.data.assets || [];
+    App.filteredAssets = [...App.assets];
+    document.getElementById('asset-count-label').textContent = `${App.assets.length} รายการ`;
+    renderAssetsTable(App.filteredAssets);
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state"><p>โหลดล้มเหลว: ${e.message||e}</p></div>`;
+  }
+}
+
+function filterAssets() {
+  const q      = (document.getElementById('search-input').value||'').toLowerCase();
+  const type   = document.getElementById('filter-type').value;
+  const status = document.getElementById('filter-status').value;
+  const risk   = document.getElementById('filter-risk').value;
+  const ntOnly = document.getElementById('filter-nt').checked;
+
+  App.filteredAssets = App.assets.filter(a => {
+    if (type   && a.type !== type) return false;
+    if (status && a.status !== status) return false;
+    if (risk   && a.risk_level_id !== risk) return false;
+    if (ntOnly && a.is_nt_device !== 'TRUE') return false;
+    if (q && ![a.name,a.asset_id,a.ip_address,a.department,a.asset_number].some(v=>(v||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  renderAssetsTable(App.filteredAssets);
+  document.getElementById('asset-count-label').textContent =
+    `${App.filteredAssets.length} / ${App.assets.length} รายการ`;
+}
+
+function renderAssetsTable(assets) {
+  const el = document.getElementById('assets-table-wrap');
+  if (!assets.length) {
+    el.innerHTML = `<div class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <h3>ไม่พบอุปกรณ์</h3><p>ลองปรับเงื่อนไขการค้นหา</p></div>`;
+    return;
+  }
+
+  let html = `<div style="overflow-x:auto;"><table class="data-table"><thead><tr>
+    <th>อุปกรณ์</th><th>ประเภท</th><th>IP Address</th>
+    <th>ตำแหน่ง</th><th>ความเสี่ยง</th><th>สถานะ</th>`;
+  if (App.userInfo.isAdmin) html += `<th></th>`;
+  html += `</tr></thead><tbody>`;
+
+  assets.forEach(a => {
+    html += `<tr onclick="openPanel('${a.asset_id}')">
+      <td>
+        <div class="asset-name-cell">${a.name}
+          ${a.is_nt_device === 'TRUE' ? `<span class="nt-badge" style="margin-left:6px">NT</span>` : ''}
+        </div>
+        <div class="asset-id-cell">${a.asset_id}</div>
+      </td>
+      <td>${typeIconHTML(a.type)} ${a.type}</td>
+      <td class="ip-cell">${a.ip_address||'—'}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${a.location||'—'}</td>
+      <td>${a.risk_level_id ? riskBadgeHTML(a.risk_level_id) : '<span style="color:var(--text-light);font-size:12px">—</span>'}</td>
+      <td>${statusBadgeHTML(a.status)}</td>`;
+    if (App.userInfo.isAdmin) {
+      html += `<td onclick="event.stopPropagation()">
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="openAssetModal('${a.asset_id}')" title="แก้ไข">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="openDeleteModal('${a.asset_id}','${a.name}')" title="ลบ" style="color:var(--danger)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </td>`;
+    }
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+// ASSET DETAIL PANEL
+// ══════════════════════════════════════════════════════════
+async function loadAssetDetail(assetId) {
+  // reset tabs
+  document.getElementById('panel-tab-info').innerHTML  = `<div class="page-loading"><div class="spinner"></div></div>`;
+  document.getElementById('panel-tab-roles').innerHTML = '';
+  document.getElementById('panel-tab-risk').innerHTML  = '';
+  document.getElementById('panel-tab-access').innerHTML= '';
+  document.getElementById('panel-tab-plan').innerHTML  = '';
+  document.querySelectorAll('#panel-tabs .tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.querySelectorAll('[id^="panel-tab-"]').forEach((p,i) => p.classList.toggle('active', i===0));
+
+  try {
+    const res = await gasCall('GET_ASSET_FULL', { asset_id: assetId });
+    if (!res.success) {
+      document.getElementById('panel-tab-info').innerHTML = `<div class="empty-state"><p>${res.message}</p></div>`;
+      return;
+    }
+    const { asset, roles, risk, access, plan } = res.data;
+
+    // Header
+    document.getElementById('panel-asset-name').textContent = asset.name;
+    document.getElementById('panel-meta').innerHTML =
+      `${riskBadgeHTML(risk.risk_level_id || '')}
+       ${statusBadgeHTML(asset.status)}
+       ${asset.is_nt_device === 'TRUE' ? `<span class="nt-badge">NT</span>` : ''}
+       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-light)">${asset.asset_id}</span>`;
+
+    // Admin actions
+    if (App.userInfo.isAdmin) {
+      document.getElementById('panel-admin-actions').style.display = 'flex';
+      document.getElementById('panel-edit-btn').onclick = () => openAssetModal(asset.asset_id);
+      document.getElementById('panel-delete-btn').onclick = () => openDeleteModal(asset.asset_id, asset.name);
+    }
+
+    // Tab: Info
+    document.getElementById('panel-tab-info').innerHTML = `
+      <div class="info-grid">
+        <div class="info-item"><div class="info-label">ชื่ออุปกรณ์</div><div class="info-value">${asset.name}</div></div>
+        <div class="info-item"><div class="info-label">ประเภท</div><div class="info-value">${typeIconHTML(asset.type)} ${asset.type}</div></div>
+        <div class="info-item"><div class="info-label">หมายเลขครุภัณฑ์</div><div class="info-value mono">${asset.asset_number||'—'}</div></div>
+        <div class="info-item"><div class="info-label">ยี่ห้อ / รุ่น</div><div class="info-value">${[asset.brand,asset.model].filter(Boolean).join(' / ')||'—'}</div></div>
+        <div class="info-item"><div class="info-label">Serial Number</div><div class="info-value mono">${asset.serial_number||'—'}</div></div>
+        <div class="info-item"><div class="info-label">MAC Address</div><div class="info-value mono">${asset.mac_address||'—'}</div></div>
+        <div class="info-item"><div class="info-label">IP Address</div><div class="info-value mono">${asset.ip_address||'—'}</div></div>
+        <div class="info-item"><div class="info-label">ตำแหน่งที่ตั้ง</div><div class="info-value">${asset.location||'—'}</div></div>
+        <div class="info-item"><div class="info-label">แผนก</div><div class="info-value">${asset.department||'—'}</div></div>
+        <div class="info-item"><div class="info-label">อุปกรณ์ NT</div><div class="info-value">${asset.is_nt_device==='TRUE'?'<span class="nt-badge">✓ ใช่</span>':'ไม่ใช่'}</div></div>
+        <div class="info-item"><div class="info-label">วันจัดซื้อ</div><div class="info-value">${asset.purchase_date||'—'}</div></div>
+        <div class="info-item"><div class="info-label">หมดประกัน</div><div class="info-value">${asset.warranty_expire||'—'}</div></div>
+      </div>
+      ${asset.description ? `<hr class="divider"><div class="info-item"><div class="info-label">คำอธิบาย</div><div class="info-value" style="font-size:13px;line-height:1.6">${asset.description}</div></div>` : ''}
+      <hr class="divider">
+      <div style="display:flex;gap:16px;">
+        <div class="info-item"><div class="info-label">สร้างเมื่อ</div><div class="info-value" style="font-size:12px;color:var(--text-muted)">${asset.created_at}</div></div>
+        <div class="info-item"><div class="info-label">อัปเดตล่าสุด</div><div class="info-value" style="font-size:12px;color:var(--text-muted)">${asset.updated_at}</div></div>
+      </div>`;
+
+    // Tab: Roles
+    document.getElementById('panel-tab-roles').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="info-item"><div class="info-label">หน้าที่และความรับผิดชอบ</div><div class="info-value" style="font-size:13px;line-height:1.7;white-space:pre-wrap">${roles.responsibilities||'<span class="empty">ยังไม่ได้กรอกข้อมูล</span>'}</div></div>
+        <hr class="divider">
+        <div class="info-item"><div class="info-label">ระบบที่เชื่อมต่อ</div><div class="info-value" style="font-size:13px;line-height:1.7;white-space:pre-wrap">${roles.connected_systems||'<span class="empty">—</span>'}</div></div>
+        <hr class="divider">
+        <div class="info-grid">
+          <div class="info-item"><div class="info-label">ผู้ดูแล/ผู้ใช้หลัก</div><div class="info-value">${roles.owner||'—'}</div></div>
+        </div>
+        ${roles.notes ? `<div class="info-item"><div class="info-label">หมายเหตุ</div><div class="info-value" style="font-size:13px;line-height:1.6">${roles.notes}</div></div>` : ''}
+      </div>`;
+
+    // Tab: Risk
+    const rl = getRiskLevel(risk.risk_level_id);
+    document.getElementById('panel-tab-risk').innerHTML = `
+      <div style="background:${rl.color}15;border:1px solid ${rl.color}40;border-radius:12px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;">
+        <div style="width:48px;height:48px;background:${rl.color};border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <span style="color:#fff;font-size:22px">⚡</span>
+        </div>
+        <div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:4px">ระดับความเสี่ยง</div>
+          <div style="font-size:18px;font-weight:700;color:${rl.color}">${rl.label}</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="info-item"><div class="info-label">คำอธิบายความเสี่ยง</div><div class="info-value" style="font-size:13px;line-height:1.7;white-space:pre-wrap">${risk.risk_description||'<span class="empty">—</span>'}</div></div>
+        <hr class="divider">
+        <div class="info-item"><div class="info-label">ผลกระทบเมื่อเสียหาย</div><div class="info-value" style="font-size:13px;line-height:1.7;white-space:pre-wrap">${risk.impact_if_failed||'<span class="empty">—</span>'}</div></div>
+        <hr class="divider">
+        <div class="info-item"><div class="info-label">ผลกระทบต่อเนื่อง</div><div class="info-value" style="font-size:13px;line-height:1.7;white-space:pre-wrap">${risk.cascading_impact||'<span class="empty">—</span>'}</div></div>
+      </div>`;
+
+    // Tab: Access (1 user per machine)
+    const isAdminUser = App.userInfo.isAdmin;
+    document.getElementById('panel-tab-access').innerHTML = `
+      <div style="background:#fef9c3;border:1px solid #fde047;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;color:#854d0e;display:flex;gap:8px;align-items:flex-start;">
+        <span>⚠️</span>
+        <span>1 เครื่อง : 1 User — ข้อมูลสิทธิ์เข้าถึงของอุปกรณ์นี้${isAdminUser ? '' : ' (รหัสผ่านถูกซ่อน เฉพาะ Admin เท่านั้น)'}</span>
+      </div>
+      <div class="info-grid">
+        <div class="info-item"><div class="info-label">Windows Username</div><div class="info-value mono">${access.windows_username||'—'}</div></div>
+        <div class="info-item"><div class="info-label">ระดับสิทธิ์</div><div class="info-value">${access.access_level||'—'}</div></div>
+        <div class="info-item"><div class="info-label">รหัสผ่าน</div>
+          <div class="info-value mono" style="display:flex;align-items:center;gap:8px;">
+            <span id="pw-display-${asset.asset_id}">${isAdminUser ? '••••••••' : '••••••••'}</span>
+            ${isAdminUser ? `<button class="btn btn-ghost btn-sm" style="padding:3px 8px;font-size:11px" onclick="togglePw('${asset.asset_id}','${(access.windows_password||'').replace(/'/g,"\\'")}')">แสดง</button>` : ''}
+          </div>
+        </div>
+        <div class="info-item"><div class="info-label">เปลี่ยนรหัสผ่านล่าสุด</div><div class="info-value">${access.last_password_change||'—'}</div></div>
+      </div>`;
+
+    // Tab: Plan
+    document.getElementById('panel-tab-plan').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="info-item">
+          <div class="info-label">📦 แผนสำรองข้อมูล (Backup Plan)</div>
+          <div class="info-value" style="font-size:13px;line-height:1.7;white-space:pre-wrap">${plan.backup_plan||'<span class="empty">ยังไม่ได้กำหนด</span>'}</div>
+        </div>
+        <hr class="divider">
+        <div class="info-item">
+          <div class="info-label">🚨 แผนฉุกเฉิน (Contingency Plan)</div>
+          <div class="info-value" style="font-size:13px;line-height:1.7;white-space:pre-wrap">${plan.contingency_plan||'<span class="empty">ยังไม่ได้กำหนด</span>'}</div>
+        </div>
+        <hr class="divider">
+        <div class="info-grid">
+          <div class="info-item"><div class="info-label">กำหนดบำรุงรักษา</div><div class="info-value">${plan.maintenance_schedule||'—'}</div></div>
+          <div class="info-item"><div class="info-label">ผู้รับผิดชอบ</div><div class="info-value">${plan.responsible_person||'—'}</div></div>
+        </div>
+        ${plan.notes ? `<hr class="divider"><div class="info-item"><div class="info-label">หมายเหตุ</div><div class="info-value" style="font-size:13px;line-height:1.6">${plan.notes}</div></div>` : ''}
+      </div>`;
+
+  } catch(e) {
+    document.getElementById('panel-tab-info').innerHTML = `<div class="empty-state"><p>โหลดข้อมูลล้มเหลว</p></div>`;
+  }
+}
+
+function togglePw(assetId, pw) {
+  const el = document.getElementById('pw-display-' + assetId);
+  if (el.textContent === '••••••••') el.textContent = pw;
+  else el.textContent = '••••••••';
+}
+
+// ══════════════════════════════════════════════════════════
+// NETWORK PAGE
+// ══════════════════════════════════════════════════════════
+async function loadNetwork() {
+  const el = document.getElementById('network-content');
+  el.innerHTML = `<div class="page-loading"><div class="spinner"></div></div>`;
+  try {
+    const res = await gasCall('GET_ASSET_LIST', { is_nt_device: true });
+    if (!res.success) { el.innerHTML = `<div class="empty-state"><p>${res.message}</p></div>`; return; }
+    const assets = res.data.assets || [];
+    renderNetwork(assets);
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state"><p>โหลดล้มเหลว</p></div>`;
+  }
+}
+
+function renderNetwork(assets) {
+  const el = document.getElementById('network-content');
+  if (!assets.length) {
+    el.innerHTML = `<div class="empty-state"><h3>ไม่พบอุปกรณ์ NT</h3><p>ยังไม่มีอุปกรณ์เครือข่ายในระบบ</p></div>`;
+    return;
+  }
+
+  const typeGroups = {};
+  assets.forEach(a => {
+    if (!typeGroups[a.type]) typeGroups[a.type] = [];
+    typeGroups[a.type].push(a);
+  });
+
+  let html = `
+  <div style="margin-bottom:20px;padding:16px 20px;background:#fff;border:1px solid var(--border);border-radius:12px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;">
+    <div>
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">อุปกรณ์ NT ทั้งหมด</div>
+      <div style="font-size:28px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:#8b5cf6">${assets.length}</div>
+    </div>
+    ${Object.entries(typeGroups).map(([t,a])=>`
+    <div style="padding:8px 16px;background:#f8fafc;border-radius:8px;text-align:center;">
+      <div style="font-size:20px">${typeIconHTML(t)}</div>
+      <div style="font-size:16px;font-weight:700">${a.length}</div>
+      <div style="font-size:11px;color:var(--text-muted)">${t}</div>
+    </div>`).join('')}
+  </div>`;
+
+  Object.entries(typeGroups).forEach(([type, group]) => {
+    html += `
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <span style="font-size:20px">${typeIconHTML(type)}</span>
+        <h2>${type}</h2>
+        <span class="card-sub">${group.length} เครื่อง</span>
+        ${App.userInfo.isAdmin ? `<button class="btn btn-primary btn-sm" onclick="openAssetModal()" style="margin-left:8px">+ เพิ่ม</button>` : ''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:16px;">`;
+    group.forEach(a => {
+      const rl = getRiskLevel(a.risk_level_id);
+      html += `
+      <div onclick="openPanel('${a.asset_id}')" style="border:1px solid ${rl.color}40;border-radius:10px;padding:16px;cursor:pointer;transition:box-shadow .15s;background:#fff"
+           onmouseover="this.style.boxShadow='0 4px 16px ${rl.color}20'" onmouseout="this.style.boxShadow='none'">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-weight:700;font-size:14px">${a.name}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted)">${a.asset_id}</div>
+          </div>
+          <div style="width:10px;height:10px;border-radius:50%;background:${a.status==='ใช้งาน'?'#22c55e':'#ef4444'};margin-top:4px;flex-shrink:0"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
+          <div><span style="color:var(--text-muted)">IP: </span><span style="font-family:'IBM Plex Mono',monospace">${a.ip_address||'—'}</span></div>
+          <div><span style="color:var(--text-muted)">MAC: </span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px">${a.mac_address||'—'}</span></div>
+          <div><span style="color:var(--text-muted)">ที่ตั้ง: </span>${a.location||'—'}</div>
+          <div>${riskBadgeHTML(a.risk_level_id)}</div>
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;color:var(--text-muted)">${a.brand||''} ${a.model||''}</span>
+          ${statusBadgeHTML(a.status)}
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+// RISK PAGE
+// ══════════════════════════════════════════════════════════
+async function loadRisk() {
+  const el = document.getElementById('risk-content');
+  el.innerHTML = `<div class="page-loading"><div class="spinner"></div></div>`;
+  try {
+    const res = await gasCall('GET_ASSET_LIST', {});
+    if (!res.success) return;
+    renderRisk(res.data.assets || []);
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state"><p>โหลดล้มเหลว</p></div>`;
+  }
+}
+
+function renderRisk(assets) {
+  const el = document.getElementById('risk-content');
+  const byLevel = {};
+  App.riskLevels.forEach(r => { byLevel[r.id] = []; });
+  assets.forEach(a => {
+    if (byLevel[a.risk_level_id]) byLevel[a.risk_level_id].push(a);
+    else byLevel[''] = [...(byLevel['']||[]), a];
+  });
+
+  let html = `
+  <div style="margin-bottom:20px;padding:16px 20px;background:#fff;border:1px solid var(--border);border-radius:12px;">
+    <h3 style="margin:0 0 14px;font-size:14px;font-weight:700">สรุประดับความเสี่ยงทั้งหมด</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;">
+      ${App.riskLevels.map(r => {
+        const count = (byLevel[r.id]||[]).length;
+        return `<div style="flex:1;min-width:100px;background:${r.color}15;border:1px solid ${r.color}40;border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-size:28px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:${r.color}">${count}</div>
+          <div style="font-size:12px;font-weight:600;color:${r.color}">${r.label}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  App.riskLevels.slice().reverse().forEach(r => {
+    const group = byLevel[r.id] || [];
+    html += `
+    <div class="card" style="margin-bottom:16px;border-top:4px solid ${r.color};">
+      <div class="card-header">
+        <span style="width:12px;height:12px;border-radius:50%;background:${r.color};flex-shrink:0"></span>
+        <h2>ความเสี่ยง: ${r.label}</h2>
+        <span class="card-sub">${group.length} อุปกรณ์</span>
+      </div>`;
+    if (group.length === 0) {
+      html += `<div style="padding:16px 20px;font-size:13px;color:var(--text-light)">ไม่มีอุปกรณ์ในระดับนี้</div>`;
+    } else {
+      html += `<div style="overflow-x:auto;"><table class="data-table"><thead><tr>
+        <th>อุปกรณ์</th><th>ประเภท</th><th>แผนก</th><th>IP</th><th>สถานะ</th>
+      </tr></thead><tbody>`;
+      group.forEach(a => {
+        html += `<tr onclick="openPanel('${a.asset_id}')">
+          <td><div class="asset-name-cell">${a.name}${a.is_nt_device==='TRUE'?` <span class="nt-badge">NT</span>`:''}</div><div class="asset-id-cell">${a.asset_id}</div></td>
+          <td>${typeIconHTML(a.type)} ${a.type}</td>
+          <td style="font-size:12px">${a.department||'—'}</td>
+          <td class="ip-cell">${a.ip_address||'—'}</td>
+          <td>${statusBadgeHTML(a.status)}</td>
+        </tr>`;
+      });
+      html += `</tbody></table></div>`;
+    }
+    html += `</div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+// ADMIN PAGE
+// ══════════════════════════════════════════════════════════
+async function loadAdmin() {
+  const el = document.getElementById('admin-content');
+  if (!App.userInfo.isAdmin) {
+    el.innerHTML = `<div class="empty-state"><h3>ไม่มีสิทธิ์</h3><p>เฉพาะ Admin เท่านั้น</p></div>`;
+    return;
+  }
+  renderAdminPanel();
+}
+
+function renderAdminPanel() {
+  const el = document.getElementById('admin-content');
+  let levelsHTML = '';
+  App.riskLevels.forEach((r, i) => {
+    levelsHTML += `
+    <div class="risk-level-row" id="rl-row-${i}">
+      <div style="cursor:grab;color:var(--text-light)">⠿</div>
+      <div class="form-group">
+        <input type="text" class="form-control" value="${r.label}" id="rl-label-${i}" placeholder="ชื่อระดับ" style="font-size:13px">
+      </div>
+      <div class="color-input-wrap">
+        <input type="color" value="${r.color}" id="rl-color-${i}" oninput="updateRiskPreview(${i})">
+        <input type="text" class="form-control" value="${r.color}" id="rl-color-text-${i}" placeholder="#hex" style="font-size:12px;font-family:'IBM Plex Mono',monospace" oninput="syncColorInput(${i})">
+      </div>
+      <div>
+        <span id="rl-preview-${i}" class="risk-badge" style="background:${r.color}20;color:${r.color};border:1px solid ${r.color}40">
+          <span class="risk-dot" style="background:${r.color}"></span>${r.label}
+        </span>
+      </div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="removeRiskLevel(${i})" style="color:var(--danger)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`;
+  });
+
+  el.innerHTML = `
+  <div style="max-width:820px;">
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+        <h2>จัดการระดับความเสี่ยง</h2>
+        <span class="card-sub">กำหนดเองได้ทั้งหมด</span>
+      </div>
+      <div class="card-body">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">
+          กำหนดชื่อและสีของแต่ละระดับความเสี่ยงได้เอง อุปกรณ์ทั้งหมดจะแสดงผลตาม config นี้ทันที
+        </div>
+        <div style="border:1px solid var(--border);border-radius:10px;padding:4px 16px;" id="risk-levels-editor">
+          ${levelsHTML}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:12px;">
+          <button class="btn btn-ghost btn-sm" onclick="addRiskLevel()">+ เพิ่มระดับ</button>
+          <button class="btn btn-primary" onclick="saveRiskLevels()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+            บันทึก Risk Levels
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <h2>Admin Access</h2>
+      </div>
+      <div class="card-body">
+        <div class="info-grid">
+          <div class="info-item"><div class="info-label">อีเมล</div><div class="info-value mono">${App.userInfo.email}</div></div>
+          <div class="info-item"><div class="info-label">สิทธิ์</div><div class="info-value"><span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700">Administrator</span></div></div>
+        </div>
+        <hr class="divider">
+        <div style="font-size:12.5px;color:var(--text-muted);line-height:1.7">
+          Admin ถูกกำหนดโดย Google Email ใน <code style="background:var(--surface-2);padding:1px 6px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px">CONFIG.ADMIN_EMAILS</code> ใน <code style="background:var(--surface-2);padding:1px 6px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px">Config.gs</code>
+          เพื่อเพิ่ม Admin ให้แก้ไขไฟล์ดังกล่าวใน Google Apps Script Editor
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function updateRiskPreview(i) {
+  const color = document.getElementById(`rl-color-${i}`).value;
+  const label = document.getElementById(`rl-label-${i}`).value;
+  document.getElementById(`rl-color-text-${i}`).value = color;
+  const prev = document.getElementById(`rl-preview-${i}`);
+  prev.style.background = color + '20';
+  prev.style.color = color;
+  prev.style.border = `1px solid ${color}40`;
+  prev.querySelector('.risk-dot').style.background = color;
+  prev.childNodes[prev.childNodes.length-1].textContent = label;
+}
+
+function syncColorInput(i) {
+  const hex = document.getElementById(`rl-color-text-${i}`).value;
+  if (/^#[0-9a-fA-F]{6}$/.test(hex)) {
+    document.getElementById(`rl-color-${i}`).value = hex;
+    updateRiskPreview(i);
+  }
+}
+
+function addRiskLevel() {
+  App.riskLevels.push({ id: 'level_' + Date.now(), label: 'ระดับใหม่', color: '#6366f1', textColor: '#fff', order: App.riskLevels.length + 1 });
+  renderAdminPanel();
+}
+
+function removeRiskLevel(i) {
+  App.riskLevels.splice(i, 1);
+  renderAdminPanel();
+}
+
+async function saveRiskLevels() {
+  const count = document.querySelectorAll('[id^="rl-label-"]').length;
+  const levels = [];
+  for (let i = 0; i < count; i++) {
+    const label = document.getElementById(`rl-label-${i}`)?.value;
+    const color = document.getElementById(`rl-color-${i}`)?.value;
+    if (label && color) {
+      levels.push({ id: App.riskLevels[i]?.id || ('level_'+i), label, color, textColor: '#fff', order: i+1 });
+    }
+  }
+  try {
+    const res = await gasCall('SAVE_RISK_LEVELS', { levels });
+    if (res.success) {
+      App.riskLevels = levels;
+      showToast('บันทึก Risk Levels สำเร็จ', 'success');
+      loadRiskFilterOptions();
+    } else { showToast(res.message, 'error'); }
+  } catch(e) { showToast('เกิดข้อผิดพลาด', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// AUDIT LOG
+// ══════════════════════════════════════════════════════════
+async function loadAudit() {
+  const el = document.getElementById('audit-content');
+  el.innerHTML = `<div class="page-loading"><div class="spinner"></div></div>`;
+  try {
+    const res = await gasCall('GET_AUDIT_LOG', { limit: 100 });
+    if (!res.success) { el.innerHTML = `<div class="empty-state"><p>${res.message}</p></div>`; return; }
+    const logs = res.data || [];
+    if (!logs.length) {
+      el.innerHTML = `<div class="empty-state"><h3>ยังไม่มี Log</h3><p>การเปลี่ยนแปลงข้อมูลจะถูกบันทึกที่นี่</p></div>`;
+      return;
+    }
+    const actionColors = { CREATE:'#22c55e', UPDATE:'#3b82f6', SOFT_DELETE:'#f97316', HARD_DELETE:'#ef4444' };
+    const actionLabel = { CREATE:'เพิ่ม', UPDATE:'แก้ไข', SOFT_DELETE:'เปลี่ยนสถานะ', HARD_DELETE:'ลบถาวร' };
+    let html = `<div class="card"><div class="card-header"><h2>Audit Log</h2><span class="card-sub">${logs.length} รายการล่าสุด</span></div>
+    <div style="overflow-x:auto;"><table class="data-table"><thead><tr>
+      <th>เวลา</th><th>Action</th><th>อุปกรณ์</th><th>ผู้ทำรายการ</th>
+    </tr></thead><tbody>`;
+    logs.forEach(l => {
+      const c = actionColors[l.action] || '#94a3b8';
+      html += `<tr>
+        <td style="font-size:11.5px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted)">${l.timestamp}</td>
+        <td><span style="background:${c}20;color:${c};border:1px solid ${c}40;padding:2px 8px;border-radius:99px;font-size:11.5px;font-weight:700">${actionLabel[l.action]||l.action}</span></td>
+        <td>
+          <div style="font-weight:600;font-size:13px">${l.asset_name}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted)">${l.asset_id}</div>
+        </td>
+        <td style="font-size:12px;color:var(--text-muted)">${l.actor_email}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+    el.innerHTML = html;
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state"><p>โหลดล้มเหลว</p></div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// ASSET FORM (Add / Edit)
+// ══════════════════════════════════════════════════════════
+async function renderAssetForm(assetId) {
+  const el = document.getElementById('asset-form-content');
+  el.innerHTML = `<div class="page-loading"><div class="spinner"></div></div>`;
+
+  let d = {};
+  if (assetId) {
+    try {
+      const res = await gasCall('GET_ASSET_FULL', { asset_id: assetId });
+      if (res.success) {
+        d = { ...res.data.asset, ...res.data.roles, ...res.data.risk, ...res.data.access, ...res.data.plan };
+        d.role_notes = res.data.roles.notes;
+        d.plan_notes = res.data.plan.notes;
+      }
+    } catch(e) {}
+  }
+
+  const typeOpts = App.assetTypes.map(t => `<option value="${t}" ${d.type===t?'selected':''}>${typeIconHTML(t)} ${t}</option>`).join('');
+  const statusOpts = App.assetStatus.map(s => `<option value="${s}" ${d.status===s?'selected':''}>${s}</option>`).join('');
+  const accessOpts = App.accessLevels.map(a => `<option value="${a}" ${d.access_level===a?'selected':''}>${a}</option>`).join('');
+  const riskOpts = App.riskLevels.map(r => `<option value="${r.id}" ${d.risk_level_id===r.id?'selected':''}>${r.label}</option>`).join('');
+
+  el.innerHTML = `
+  <div class="form-grid">
+    <div class="form-section-title">📋 ข้อมูลทั่วไป</div>
+    <div class="form-group">
+      <label class="form-label">ชื่ออุปกรณ์ <span class="req">*</span></label>
+      <input type="text" id="f-name" class="form-control" value="${d.name||''}" placeholder="เช่น PC-FINANCE-01">
+    </div>
+    <div class="form-group">
+      <label class="form-label">ประเภท <span class="req">*</span></label>
+      <select id="f-type" class="form-control">${typeOpts}</select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">หมายเลขครุภัณฑ์</label>
+      <input type="text" id="f-asset_number" class="form-control" value="${d.asset_number||''}" placeholder="เช่น ครภ.001/2566">
+    </div>
+    <div class="form-group">
+      <label class="form-label">สถานะ</label>
+      <select id="f-status" class="form-control">${statusOpts}</select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">ยี่ห้อ</label>
+      <input type="text" id="f-brand" class="form-control" value="${d.brand||''}" placeholder="เช่น Dell, Lenovo">
+    </div>
+    <div class="form-group">
+      <label class="form-label">รุ่น</label>
+      <input type="text" id="f-model" class="form-control" value="${d.model||''}" placeholder="เช่น OptiPlex 7090">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Serial Number</label>
+      <input type="text" id="f-serial_number" class="form-control" value="${d.serial_number||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">MAC Address</label>
+      <input type="text" id="f-mac_address" class="form-control" value="${d.mac_address||''}" placeholder="AA:BB:CC:DD:EE:FF" style="font-family:'IBM Plex Mono',monospace">
+    </div>
+    <div class="form-group">
+      <label class="form-label">IP Address</label>
+      <input type="text" id="f-ip_address" class="form-control" value="${d.ip_address||''}" placeholder="192.168.1.x" style="font-family:'IBM Plex Mono',monospace">
+    </div>
+    <div class="form-group">
+      <label class="form-label">ตำแหน่งที่ตั้ง</label>
+      <input type="text" id="f-location" class="form-control" value="${d.location||''}" placeholder="เช่น ห้อง IT ชั้น 1">
+    </div>
+    <div class="form-group">
+      <label class="form-label">แผนก</label>
+      <input type="text" id="f-department" class="form-control" value="${d.department||''}" placeholder="เช่น IT, การเงิน">
+    </div>
+    <div class="form-group">
+      <label class="form-label">วันที่จัดซื้อ</label>
+      <input type="date" id="f-purchase_date" class="form-control" value="${d.purchase_date||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">วันหมดประกัน</label>
+      <input type="date" id="f-warranty_expire" class="form-control" value="${d.warranty_expire||''}">
+    </div>
+    <div class="form-group" style="display:flex;align-items:center;gap:10px;padding-top:24px">
+      <input type="checkbox" id="f-is_nt_device" ${d.is_nt_device==='TRUE'?'checked':''} style="accent-color:var(--accent);width:16px;height:16px;">
+      <label for="f-is_nt_device" class="form-label" style="cursor:pointer;margin:0">อุปกรณ์ NT</label>
+    </div>
+    <div class="form-group form-full">
+      <label class="form-label">คำอธิบาย</label>
+      <textarea id="f-description" class="form-control">${d.description||''}</textarea>
+    </div>
+
+    <div class="form-section-title">⚙️ หน้าที่และความรับผิดชอบ</div>
+    <div class="form-group form-full">
+      <label class="form-label">หน้าที่ / งานที่รับผิดชอบ</label>
+      <textarea id="f-responsibilities" class="form-control" rows="3">${d.responsibilities||''}</textarea>
+    </div>
+    <div class="form-group form-full">
+      <label class="form-label">ระบบที่เชื่อมต่อ</label>
+      <textarea id="f-connected_systems" class="form-control" rows="2">${d.connected_systems||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">ผู้ดูแล / ผู้ใช้หลัก</label>
+      <input type="text" id="f-owner" class="form-control" value="${d.owner||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">หมายเหตุ (หน้าที่)</label>
+      <input type="text" id="f-role_notes" class="form-control" value="${d.role_notes||''}">
+    </div>
+
+    <div class="form-section-title">⚠️ ความเสี่ยง</div>
+    <div class="form-group">
+      <label class="form-label">ระดับความเสี่ยง</label>
+      <select id="f-risk_level_id" class="form-control">${riskOpts}</select>
+    </div>
+    <div class="form-group form-full">
+      <label class="form-label">คำอธิบายความเสี่ยง</label>
+      <textarea id="f-risk_description" class="form-control" rows="2">${d.risk_description||''}</textarea>
+    </div>
+    <div class="form-group form-full">
+      <label class="form-label">ผลกระทบเมื่อเสียหาย</label>
+      <textarea id="f-impact_if_failed" class="form-control" rows="2">${d.impact_if_failed||''}</textarea>
+    </div>
+    <div class="form-group form-full">
+      <label class="form-label">ผลกระทบต่อเนื่อง</label>
+      <textarea id="f-cascading_impact" class="form-control" rows="2">${d.cascading_impact||''}</textarea>
+    </div>
+
+    <div class="form-section-title">🔐 สิทธิ์เข้าถึง Windows (1 User / 1 เครื่อง)</div>
+    <div class="form-group">
+      <label class="form-label">Windows Username</label>
+      <input type="text" id="f-windows_username" class="form-control" value="${d.windows_username||''}" style="font-family:'IBM Plex Mono',monospace">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Windows Password</label>
+      <input type="password" id="f-windows_password" class="form-control" value="${d.windows_password||''}" style="font-family:'IBM Plex Mono',monospace" placeholder="เว้นว่างถ้าไม่ต้องการเปลี่ยน">
+    </div>
+    <div class="form-group">
+      <label class="form-label">ระดับสิทธิ์</label>
+      <select id="f-access_level" class="form-control">${accessOpts}</select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">วันที่เปลี่ยนรหัสผ่านล่าสุด</label>
+      <input type="date" id="f-last_password_change" class="form-control" value="${d.last_password_change||''}">
+    </div>
+
+    <div class="form-section-title">📋 แผนจัดการ</div>
+    <div class="form-group form-full">
+      <label class="form-label">แผนสำรองข้อมูล</label>
+      <textarea id="f-backup_plan" class="form-control" rows="2">${d.backup_plan||''}</textarea>
+    </div>
+    <div class="form-group form-full">
+      <label class="form-label">แผนฉุกเฉิน</label>
+      <textarea id="f-contingency_plan" class="form-control" rows="2">${d.contingency_plan||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">กำหนดการบำรุงรักษา</label>
+      <input type="text" id="f-maintenance_schedule" class="form-control" value="${d.maintenance_schedule||''}" placeholder="เช่น ทุก 3 เดือน">
+    </div>
+    <div class="form-group">
+      <label class="form-label">ผู้รับผิดชอบ</label>
+      <input type="text" id="f-responsible_person" class="form-control" value="${d.responsible_person||''}">
+    </div>
+    <div class="form-group form-full">
+      <label class="form-label">หมายเหตุ (แผนจัดการ)</label>
+      <textarea id="f-plan_notes" class="form-control" rows="2">${d.plan_notes||''}</textarea>
+    </div>
+  </div>`;
+}
+
+function getFieldVal(id) {
+  const el = document.getElementById(id);
+  if (!el) return '';
+  if (el.type === 'checkbox') return el.checked;
+  return el.value;
+}
+
+async function saveAsset() {
+  const name = getFieldVal('f-name');
+  const type = getFieldVal('f-type');
+  if (!name || !type) { showToast('กรุณากรอกชื่ออุปกรณ์และประเภท', 'error'); return; }
+
+  const fields = [
+    'name','type','asset_number','brand','model','serial_number',
+    'mac_address','ip_address','location','department','purchase_date',
+    'warranty_expire','status','description','responsibilities',
+    'connected_systems','owner','role_notes','risk_level_id',
+    'risk_description','impact_if_failed','cascading_impact',
+    'windows_username','windows_password','access_level',
+    'last_password_change','backup_plan','contingency_plan',
+    'maintenance_schedule','responsible_person','plan_notes',
+  ];
+
+  const payload = {};
+  fields.forEach(f => { payload[f] = getFieldVal('f-' + f); });
+  payload.is_nt_device = getFieldVal('f-is_nt_device');
+
+  const btn = document.getElementById('modal-save-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spinner" style="width:14px;height:14px;border-width:2px;border-color:rgba(255,255,255,.3);border-top-color:#fff"></div> กำลังบันทึก...`;
+
+  try {
+    let res;
+    if (App.editingAssetId) {
+      payload.asset_id = App.editingAssetId;
+      res = await gasCall('UPDATE_ASSET', payload);
+    } else {
+      res = await gasCall('CREATE_ASSET', payload);
+    }
+
+    if (res.success) {
+      showToast(res.message, 'success');
+      closeAssetModal();
+      App.assets = [];
+      loadAssets();
+      if (App.currentPage === 'dashboard') loadDashboard();
+      if (App.currentPage === 'network') loadNetwork();
+      if (App.currentPage === 'risk') loadRisk();
+    } else {
+      showToast(res.message || 'เกิดข้อผิดพลาด', 'error');
+    }
+  } catch(e) {
+    showToast('เกิดข้อผิดพลาด: ' + (e.message||e), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก`;
+  }
+}
+  </script>
+</body>
+
+</html>
